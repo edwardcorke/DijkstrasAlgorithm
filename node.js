@@ -45,6 +45,9 @@ class Node{
       this.lastPosition = this.position.copy();
     } else if (this.isClicked()) {
       console.log("This node has been clicked")
+      if (document.getElementById('delete').checked) {
+        deleteNode(this);
+      }
     }
   }
 }
