@@ -21,9 +21,12 @@ function draw() {
   for (let node of nodes) {
     node.update();
   }
+
   for (let vertex of vertices) {
     vertex.show();
   }
+
+  drawAdjacencyMartrix();
 }
 
 function mouseClickedOnCanvas(){
@@ -57,7 +60,16 @@ function createNode(positionX, positionY) {
   adjacencyMatrix.push([]);
   for (let i=0; i < adjacencyMatrix.length; i++) {
     for (let j=adjacencyMatrix[i].length; j < idCounter; j++) {
-      adjacencyMatrix[i].push(null);
+      if (getNodeById(i).status == 'deleted') {
+        adjacencyMatrix[i].push(-1);
+      } else {
+        adjacencyMatrix[i].push(null);
+      }
+    }
+  }
+  for (let node of nodes) {
+    if (node.status == "deleted") {
+      flagDeleteRowColumnInAdjacencyMatric(node.id);
     }
   }
   console.log(adjacencyMatrix);
@@ -86,15 +98,14 @@ function deleteNode(node) {
     if (nodes[i] == node) {
       console.log("Node deleted");
       nodes[i].status = "deleted";
-      nodes.splice(i, 1);
+      // nodes.splice(i, 1);
       // Remove associated vertices
       for (let vertex of node.vertices) {
         deleteVertex(vertex);
       }
-      // adjacencyMatrix[node.nodeA.id][node.nodeB.id] = null;
-      // adjacencyMatrix[node.nodeB.id][node.nodeA.id] = null;
     }
   }
+  flagDeleteRowColumnInAdjacencyMatric(node.id);
 }
 
 function addVertex(nodeA, nodeB, value) {
@@ -112,8 +123,8 @@ function addVertex(nodeA, nodeB, value) {
 
 function deleteVertex(vertex) {
   // Update adjacencyMatrix
-  adjacencyMatrix[vertex.nodeA.id][vertex.nodeB.id] = null;
-  adjacencyMatrix[vertex.nodeB.id][vertex.nodeA.id] = null;  
+  // adjacencyMatrix[vertex.nodeA.id][vertex.nodeB.id] = -1;
+  // adjacencyMatrix[vertex.nodeB.id][vertex.nodeA.id] = -1;
   // remove from (total) vertices
   for (let i=0; i<vertices.length; i++) {
     if(vertices[i] == vertex) {
@@ -129,4 +140,53 @@ function deleteVertex(vertex) {
     }
   }
   console.log("Vertex deleted")
+}
+
+function flagDeleteRowColumnInAdjacencyMatric(nodeId) {
+  // Set column
+  for (let i=0; i<adjacencyMatrix.length; i++) {
+    adjacencyMatrix[i][nodeId] = -1;
+  }
+  // Set row
+  for (let i=0; i<adjacencyMatrix[nodeId].length; i++) {
+    adjacencyMatrix[nodeId][i] = -1;
+  }
+}
+
+/////
+
+function drawAdjacencyMartrix() {
+  let aMTable = document.getElementById("adjacencyMatrixTable");
+  aMTable.innerHTML = ''; // clear table contents
+
+  let tableBody = document.createElement('tbody');
+
+  for (let rowIndex=0; rowIndex < adjacencyMatrix.length; rowIndex++) {
+    let rowData = adjacencyMatrix[rowIndex];
+    let row = document.createElement('tr');
+
+    for (let cellIndex=0; cellIndex < adjacencyMatrix[rowIndex].length; cellIndex++) {
+      // let cellData = "[" + rowIndex + "," + cellIndex + "]: " + adjacencyMatrix[rowIndex][cellIndex] + "||";
+      if (adjacencyMatrix[rowIndex][cellIndex] != -1) {
+        let cellData = adjacencyMatrix[rowIndex][cellIndex];
+        let cell = document.createElement('td');
+        cell.appendChild(document.createTextNode(cellData));
+        row.appendChild(cell);
+      }
+    }
+
+    tableBody.appendChild(row);
+  }
+  aMTable.appendChild(tableBody);
+  document.body.appendChild(aMTable);
+}
+
+
+function getNodeById(id) {
+  for (let node of nodes) {
+    if (node.id == id) {
+      return node
+    }
+  }
+  return null;
 }

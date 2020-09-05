@@ -15,10 +15,12 @@ class Node{
   }
 
   show() {
-    fill(color(this.color));
-    ellipse(this.position.x, this.position.y, this.diameter, this.size);
-    fill(color(0));
-    text(this.id, this.position.x, this.position.y);
+      if (this.status == 'visible') {
+      fill(color(this.color));
+      ellipse(this.position.x, this.position.y, this.diameter, this.size);
+      fill(color(0));
+      text(this.id, this.position.x, this.position.y);
+    }
   }
 
   isClicked() {
