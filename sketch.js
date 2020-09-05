@@ -87,8 +87,11 @@ function deleteNode(node) {
       console.log("Node deleted");
       nodes[i].status = "deleted";
       nodes.splice(i, 1);
-      // FOR EACH VERTEX CONNECTED (ADD ARRAY OF VERTEXES TO NODE)
-      // adjacencyMatrix[node.id][node.nodeB.id] = null;
+      // Remove associated vertices
+      for (let vertex of node.vertices) {
+        deleteVertex(vertex);
+      }
+      // adjacencyMatrix[node.nodeA.id][node.nodeB.id] = null;
       // adjacencyMatrix[node.nodeB.id][node.nodeA.id] = null;
     }
   }
@@ -97,9 +100,33 @@ function deleteNode(node) {
 function addVertex(nodeA, nodeB, value) {
   // Create new vertex?
   if (adjacencyMatrix[nodeA.id][nodeB.id] == null && adjacencyMatrix[nodeB.id][nodeA.id] == null) {
-    vertices.push(new Vertex(nodeA, nodeB));
+    let newVertex = new Vertex(nodeA, nodeB);
+    vertices.push(newVertex);
+    nodeA.vertices.push(newVertex);
+    nodeB.vertices.push(newVertex);
   }
   adjacencyMatrix[nodeA.id][nodeB.id] = value;
   adjacencyMatrix[nodeB.id][nodeA.id] = value;
   console.log(adjacencyMatrix);
+}
+
+function deleteVertex(vertex) {
+  // Update adjacencyMatrix
+  adjacencyMatrix[vertex.nodeA.id][vertex.nodeB.id] = null;
+  adjacencyMatrix[vertex.nodeB.id][vertex.nodeA.id] = null;  
+  // remove from (total) vertices
+  for (let i=0; i<vertices.length; i++) {
+    if(vertices[i] == vertex) {
+      vertices.splice(i, 2);
+    }
+  }
+  // remove vertex from each node
+  for (let node of nodes) {
+    for( let i=0; i<node.vertices; i++) {
+      if (node.vertices[i] == vertex) {
+        node.vertices.splice(i, 1);
+      }
+    }
+  }
+  console.log("Vertex deleted")
 }
