@@ -5,6 +5,8 @@ class Node{
     this.diameter = 50;
     this.color = 255;
     this.lastPosition = this.position.copy();
+    this.status = "visible";
+    this.vertices = [];
   }
 
   update() {
