@@ -12,6 +12,7 @@ class Vertex {
     fill(color(this.color));
 
     if (this.nodeA.status == "visible" && this.nodeB.status == "visible") {
+      strokeWeight(3);
       line(this.nodeA.position.x, this.nodeA.position.y, this.nodeB.position.x, this.nodeB.position.y);
 
       // Calculate middle point between nodes
@@ -21,6 +22,7 @@ class Vertex {
       // Update value of vertex
       this.value = adjacencyMatrix[this.nodeA.id][this.nodeB.id];
       try {
+        strokeWeight(0);
         text(this.value, x, y)
       } catch {
         console.log("error drawing for nodes: " + this.nodeA.id + " and " + this.nodeB.id)

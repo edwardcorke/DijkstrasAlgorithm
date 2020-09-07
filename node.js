@@ -3,7 +3,8 @@ class Node{
     this.position = createVector(positionX, positionY);
     this.id = id;
     this.diameter = 50;
-    this.color = 255;
+    this.color = color(255);
+    this.borderColor = color(0);
     this.lastPosition = this.position.copy();
     this.status = "visible";
     this.vertices = [];
@@ -16,8 +17,11 @@ class Node{
 
   show() {
       if (this.status == 'visible') {
-      fill(color(this.color));
+      fill(this.color);
+      stroke(this.borderColor);
+      strokeWeight(3);
       ellipse(this.position.x, this.position.y, this.diameter, this.size);
+      strokeWeight(1);
       fill(color(0));
       text(this.id, this.position.x, this.position.y);
     }

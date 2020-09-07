@@ -4,13 +4,16 @@ let vertices = [];
 let adjacencyMatrix = [];
 let idCounter = 0;
 let selectedNodes = [];
+let defaultNodeColor;
 let animationSlider;
+let startNode, endNode;
 
 function setup() {
   canvas = createCanvas(100,100);
   canvas.style.position = "absolute";
   canvas.parent('canvasWrapper')
   canvas.mouseClicked(mouseClickedOnCanvas);
+  defaultNodeColor = color(255);
 
   animationSlider = createSlider(0,1,0,0.1).parent('animationControls'); // TODO: adjust increment to number of steps
 
@@ -92,15 +95,23 @@ function createNode(positionX, positionY) {
 function selectNode(node) {
   if (selectedNodes[selectedNodes.length - 1] !== node) {
     selectedNodes.push(node)
-    node.color = 200;
+    node.borderColor = color(0,0,255);
   } else if (selectedNodes[selectedNodes.length - 1] == node) {
-    selectedNodes.pop();
-    node.color = 255;
+    node.pop();
+    node.borderColor = color(0);
+    // // recolor node (depending if it is a start, end or standard node)
+    // if (startNode == node) {
+    //   node.color = color(0,255,0);
+    // } else if (endNode == node) {
+    //   node.color = color(255,0,0);
+    // } else {
+    //   node.color = 255;
+    // }
   }
   if (selectedNodes.length == 2) {
     addVertex(selectedNodes[0], selectedNodes[1], round(random(20)));
-    selectedNodes[0].color = 255;
-    selectedNodes[1].color= 255;
+    selectedNodes[0].borderColor = color(0);
+    selectedNodes[1].borderColor = color(0);
     selectedNodes = [];
     }
 }
@@ -191,8 +202,33 @@ function drawSelectedNodesInfo() {
   nodeInfoDiv.innerHTML = '';
   let node = selectedNodes[0];
   if (node != null) {
+    // Node title with id
     let nodeHeader = document.createElement('h2');
     nodeHeader.appendChild(document.createTextNode("Node: " + node.id));
+    // Delete node button
+    let deleteNodeButton = document.createElement("BUTTON");
+    deleteNodeButton.classList.add("nodeInfoButton");
+    deleteNodeButton.appendChild(document.createTextNode("delete"));
+    deleteNodeButton.onclick = function() {
+      deleteNode(node);
+    }
+    // Set node as start button
+    let setStartButton = document.createElement("BUTTON");
+    setStartButton.classList.add("nodeInfoButton");
+    setStartButton.appendChild(document.createTextNode("set as start"));
+    setStartButton.onclick = function() {
+      setStartNode(node);
+    }
+    nodeHeader.appendChild(setStartButton);
+    // Set node as start button
+    let setEndButton = document.createElement("BUTTON");
+    setEndButton.classList.add("nodeInfoButton");
+    setEndButton.appendChild(document.createTextNode("set as end"));
+    setEndButton.onclick = function() {
+      setEndNode(node);
+    }
+    nodeHeader.appendChild(setEndButton);
+
     let nodeInfoBody = document.createElement('nodeInfoBody');
 
     if (node.vertices.length > 0) {
@@ -204,7 +240,8 @@ function drawSelectedNodesInfo() {
         let infoString = " ‣ " + vertex.nodeA.id + " - " + vertex.nodeB.id + " (" + vertex.value + ")";
         cell.appendChild(document.createTextNode(infoString));
         let deleteButton = document.createElement("BUTTON");
-        deleteButton.appendChild(document.createTextNode("[X]"));
+        deleteButton.classList.add("vertexDeleteButton")
+        deleteButton.appendChild(document.createTextNode("delete"));
         deleteButton.onclick = function() {
           deleteVertex(vertex.id);
         }
@@ -232,4 +269,20 @@ function flashMessage(message, timeout) {
     flashMessageDiv.remove();
     windowResized();
   }, timeout);
+}
+
+function setStartNode(node) {
+  try {
+    startNode.color = defaultNodeColor;
+  } catch {}
+  startNode = node;
+  node.color = color(0,255,0);
+}
+
+function setEndNode(node) {
+  try {
+    endNode.color = defaultNodeColor;
+  } catch {}
+  endNode = node;
+  node.color = color(255,0,0);
 }
