@@ -1,6 +1,7 @@
 body {
   margin: 0;
   background-color: #323232;
+  /* background-color: aqua; */
 }
 table {
   border-collapse: collapse;
@@ -38,6 +39,7 @@ h1 {
   height: 100vh;
 }
 #canvasWrapper {
+  position: absolute;
   width: 75%;
   height: 100vh;
   float: left;
@@ -118,4 +120,20 @@ h1 {
 #credit {
   margin-top: 50px;
   margin-bottom: 20px;
+}
+#flashWrapper {
+  width: 35%;
+  margin: auto;
+  /* padding-top: 20px; */
+  /* height: 50px; */
+  /* background-color: yellow; */
+}
+.flashMessage {
+  /* z-index: 3; */
+  background-color: red;
+  color: white;
+  border-radius: 3px;
+  height: 30px;
+  margin-top: 15px;
+  /* position: absolute; */
 }

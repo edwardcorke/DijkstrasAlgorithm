@@ -7,7 +7,8 @@ let selectedNodes = [];
 let animationSlider;
 
 function setup() {
-  canvas = createCanvas(100,100 );
+  canvas = createCanvas(100,100);
+  canvas.style.position = "absolute";
   canvas.parent('canvasWrapper')
   canvas.mouseClicked(mouseClickedOnCanvas);
 
@@ -86,11 +87,9 @@ function createNode(positionX, positionY) {
       flagDeleteRowColumnInAdjacencyMatric(node.id);
     }
   }
-  console.log(adjacencyMatrix);
 }
 
 function selectNode(node) {
-  console.log("selected node")
   if (selectedNodes[selectedNodes.length - 1] !== node) {
     selectedNodes.push(node)
     node.color = 200;
@@ -110,6 +109,7 @@ function deleteNode(node) {
   for (let i=0; i<nodes.length; i++) {
     if (nodes[i] == node) {
       console.log("Node deleted");
+      flashMessage("Node deleted", 5000)
       nodes[i].status = "deleted";
       // Remove associated vertices
       for (let j=0; j<node.vertices.length; j++) {
@@ -132,7 +132,6 @@ function addVertex(nodeA, nodeB, value) {
   }
   adjacencyMatrix[nodeA.id][nodeB.id] = value;
   adjacencyMatrix[nodeB.id][nodeA.id] = value;
-  console.log(adjacencyMatrix);
 }
 
 function deleteVertex(vertexId) {
@@ -220,7 +219,17 @@ function drawSelectedNodesInfo() {
   }
 }
 
-
 function getNodeById(id) {
   return nodes[id];
+}
+
+function flashMessage(message, timeout) {
+  let flashMessageDiv = document.createElement("DIV");
+  flashMessageDiv.classList.add("flashMessage");
+  flashMessageDiv.appendChild(document.createTextNode(message));
+  document.getElementById("flashWrapper").appendChild(flashMessageDiv);
+  window.setTimeout(function () {
+    flashMessageDiv.remove();
+    windowResized();
+  }, timeout);
 }
