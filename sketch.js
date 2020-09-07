@@ -1,19 +1,34 @@
+// CLear node in selected node if deleted ########################
+
 let canvas;
 let nodes = [];
 let vertices = [];
 let adjacencyMatrix = [];
 let idCounter = 0;
 let selectedNodes = [];
-
+let animationSlider;
 
 function setup() {
-  canvas = createCanvas(500,500);
+  canvas = createCanvas(100,100 );
+  canvas.parent('canvasWrapper')
   canvas.mouseClicked(mouseClickedOnCanvas);
-  // canvas.mouseOver(mouseOverFuncion);
+
+  animationSlider = createSlider(0,1,0,0.1).parent('animationControls'); // TODO: adjust increment to number of steps
+
+  windowResized(); // This needs to be called to fill any gaps whilst page is loading
 
   // for (let i = 0; i < 5; i++) {
   //   createNode(round(random(width)), round(random(height))));
   // }
+}
+
+function windowResized() {
+  let animationControlsWidth = document.getElementById("animationControls").offsetWidth;
+  let infoWrapperHeight = document.getElementById("infoWrapper").offsetHeight;
+  // Resize canvas
+  resizeCanvas(document.getElementById("canvasWrapper").offsetWidth, infoWrapperHeight);
+  // Resize animation elements
+  animationSlider.style('width', animationControlsWidth - 5 + "px");
 }
 
 function draw() {
@@ -44,6 +59,10 @@ function mouseClickedOnCanvas(){
   }
 }
 
+function mouseClicked() {
+  drawSelectedNodesInfo();
+}
+
 function mouseReleased() {
   // console.log("mouse released")
   for (let node of nodes) {
@@ -63,7 +82,7 @@ function createNode(positionX, positionY) {
       if (getNodeById(i).status == 'deleted') {
         adjacencyMatrix[i].push(-1);
       } else {
-        adjacencyMatrix[i].push(null);
+        adjacencyMatrix[i].push(0);
       }
     }
   }
@@ -93,6 +112,7 @@ function selectNode(node) {
   // console.log(selectedNodes)  // TODO: show in GUI
 }
 
+// NEEDS FIXING: SOMETIMES DELETES THE WRONG VERTICES
 function deleteNode(node) {
   for (let i=0; i<nodes.length; i++) {
     if (nodes[i] == node) {
@@ -110,7 +130,7 @@ function deleteNode(node) {
 
 function addVertex(nodeA, nodeB, value) {
   // Create new vertex?
-  if (adjacencyMatrix[nodeA.id][nodeB.id] == null && adjacencyMatrix[nodeB.id][nodeA.id] == null) {
+  if (adjacencyMatrix[nodeA.id][nodeB.id] == 0 && adjacencyMatrix[nodeB.id][nodeA.id] == 0) {
     let newVertex = new Vertex(nodeA, nodeB);
     vertices.push(newVertex);
     nodeA.vertices.push(newVertex);
@@ -178,7 +198,38 @@ function drawAdjacencyMartrix() {
     tableBody.appendChild(row);
   }
   aMTable.appendChild(tableBody);
-  document.body.appendChild(aMTable);
+}
+
+function drawSelectedNodesInfo() {
+  let nodeInfoDiv = document.getElementById("selectedNodeInfo");
+  nodeInfoDiv.innerHTML = '';
+  let node = selectedNodes[0];
+  if (node != null) {
+    let nodeHeader = document.createElement('h2');
+    nodeHeader.appendChild(document.createTextNode("Node: " + node.id));
+    let nodeInfoBody = document.createElement('nodeInfoBody');
+
+    if (node.vertices.length > 0) {
+      nodeInfoBody.appendChild(document.createTextNode('Vertices: '));
+      nodeInfoBody.appendChild(document.createElement("BR"));  // line break
+      for (let vertex of node.vertices) {
+        let cell = document.createElement('tr');
+        let infoString = " ‣ " + vertex.nodeA.id + " - " + vertex.nodeB.id + " (" + vertex.value + ")";
+        cell.appendChild(document.createTextNode(infoString));
+        let deleteButton = document.createElement("BUTTON");
+        deleteButton.appendChild(document.createTextNode("[X]"));
+        deleteButton.onclick = function() {
+          deleteVertex(vertex );  // TODO: DELETE VERTEX ONLY REMOVES VISUAL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        }
+        cell.appendChild(deleteButton);
+        nodeInfoBody.appendChild(cell);
+      }
+    } else {
+      nodeInfoBody.appendChild(document.createTextNode('No vertices'));
+    }
+    nodeInfoDiv.appendChild(nodeHeader);
+    nodeInfoDiv.appendChild(nodeInfoBody);
+  }
 }
 
 

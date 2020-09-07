@@ -7,24 +7,41 @@
   <script src="sketch.js"></script>
   <script src="node.js"></script>
   <script src="vertex.js"></script>
-  <!-- <link rel="stylesheet" href="styles.css"> -->
+  <link rel="stylesheet" href="styles.css">
 
-  <style>
-    table {
-      border: 1px solid #000000
-    }
-  </style>
 </head>
 
 <body>
-  <div id="placementTypeSelect">Click operation: <br>
-    <input type="Radio" name="nodeClickOperation" id="select" value="select" checked>
-      <lable for="select">Select / Add</label><br>
-    <input type="Radio" name="nodeClickOperation" id="delete" value="delete">
-      <label for="delete">Delete</label>
-      <!-- add canvas div -->
-      <table id="adjacencyMatrixTable"></table>
-  </div><br>
+  <div id="windowWrapper">
+    <div id="canvasWrapper"></div>
+      <div id="infoWrapper">
+        <div id="title"><h1>Dijkstra's Algorithm</h1></div>
+        <div id="infoInnerWrapper">
+          <div id="placementTypeSelect">Click operation: <br>
+            <input type="Radio" name="nodeClickOperation" id="select" value="select" checked>
+            <lable for="select">Select / Add</label><br>
+              <input type="Radio" name="nodeClickOperation" id="delete" value="delete">
+              <label for="delete">Delete</label>
+          </div>
+            <div id="adjacencyMatrix">Adjacency Matrix:<br>
+              <table id="adjacencyMatrixTable"></table>
+            </div>
+            <div id="selectedNodeInfo"></div>
+            <div id="animationControls">
+              <button id="runButton">Run Dijkstra's Algorithm</button>
+              <button class="animateButton"> < </button>
+              <button class="animateButton"> pause / play </button>
+              <button class="animateButton"> > </button>
+            </div>
+            <div id="credit">
+              <a href="https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm" target="_blank">About Dijkstra's Algorithm</a><br><br>
+              Created by Edward Corke&copy;	- <a href="https://github.com/edwardcorke?tab=projects" target="_blank">GitHub</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  </div>
 </body>
 
 </html>
