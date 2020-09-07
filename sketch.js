@@ -1,5 +1,3 @@
-// CLear node in selected node if deleted ########################
-
 let canvas;
 let nodes = [];
 let vertices = [];
@@ -16,10 +14,6 @@ function setup() {
   animationSlider = createSlider(0,1,0,0.1).parent('animationControls'); // TODO: adjust increment to number of steps
 
   windowResized(); // This needs to be called to fill any gaps whilst page is loading
-
-  // for (let i = 0; i < 5; i++) {
-  //   createNode(round(random(width)), round(random(height))));
-  // }
 }
 
 function windowResized() {
@@ -38,7 +32,9 @@ function draw() {
   }
 
   for (let vertex of vertices) {
-    vertex.show();
+    if (vertex.status == "visible") {
+      vertex.show();
+    }
   }
 
   drawAdjacencyMartrix();
@@ -64,14 +60,13 @@ function mouseClicked() {
 }
 
 function mouseReleased() {
-  // console.log("mouse released")
   for (let node of nodes) {
     node.release();
   }
 }
 
 function createNode(positionX, positionY) {
-  nodes.push(new Node(positionX, positionY, idCounter++));//length of array);
+  nodes.push(new Node(positionX, positionY, idCounter++));
   console.log("Node created")
 
 
@@ -109,56 +104,50 @@ function selectNode(node) {
     selectedNodes[1].color= 255;
     selectedNodes = [];
     }
-  // console.log(selectedNodes)  // TODO: show in GUI
 }
 
-// NEEDS FIXING: SOMETIMES DELETES THE WRONG VERTICES
 function deleteNode(node) {
   for (let i=0; i<nodes.length; i++) {
     if (nodes[i] == node) {
       console.log("Node deleted");
       nodes[i].status = "deleted";
-      // nodes.splice(i, 1);
       // Remove associated vertices
-      for (let vertex of node.vertices) {
-        deleteVertex(vertex);
+      for (let j=0; j<node.vertices.length; j++) {
+        deleteVertex(node.vertices[j]);
       }
     }
   }
   flagDeleteRowColumnInAdjacencyMatric(node.id);
+  //remove from selectedNodes
+  selectedNodes.pop();
 }
 
 function addVertex(nodeA, nodeB, value) {
   // Create new vertex?
   if (adjacencyMatrix[nodeA.id][nodeB.id] == 0 && adjacencyMatrix[nodeB.id][nodeA.id] == 0) {
-    let newVertex = new Vertex(nodeA, nodeB);
+    let newVertex = new Vertex(nodeA, nodeB, vertices.length);
     vertices.push(newVertex);
-    nodeA.vertices.push(newVertex);
-    nodeB.vertices.push(newVertex);
+    nodeA.vertices.push(newVertex.id);
+    nodeB.vertices.push(newVertex.id);
   }
   adjacencyMatrix[nodeA.id][nodeB.id] = value;
   adjacencyMatrix[nodeB.id][nodeA.id] = value;
   console.log(adjacencyMatrix);
 }
 
-function deleteVertex(vertex) {
-  // Update adjacencyMatrix
-  // adjacencyMatrix[vertex.nodeA.id][vertex.nodeB.id] = -1;
-  // adjacencyMatrix[vertex.nodeB.id][vertex.nodeA.id] = -1;
-  // remove from (total) vertices
-  for (let i=0; i<vertices.length; i++) {
-    if(vertices[i] == vertex) {
-      vertices.splice(i, 2);
-    }
-  }
+function deleteVertex(vertexId) {
+  let vertex = vertices[vertexId];
+  vertex.status = "deleted";
   // remove vertex from each node
   for (let node of nodes) {
-    for( let i=0; i<node.vertices; i++) {
-      if (node.vertices[i] == vertex) {
+    for(let i=0; i<node.vertices.length; i++) {
+      if (node.vertices[i] == vertexId) {
         node.vertices.splice(i, 1);
       }
     }
   }
+  adjacencyMatrix[vertex.nodeA.id][vertex.nodeB.id] = 0;
+  adjacencyMatrix[vertex.nodeB.id][vertex.nodeA.id] = 0;
   console.log("Vertex deleted")
 }
 
@@ -172,8 +161,6 @@ function flagDeleteRowColumnInAdjacencyMatric(nodeId) {
     adjacencyMatrix[nodeId][i] = -1;
   }
 }
-
-/////
 
 function drawAdjacencyMartrix() {
   let aMTable = document.getElementById("adjacencyMatrixTable");
@@ -212,14 +199,15 @@ function drawSelectedNodesInfo() {
     if (node.vertices.length > 0) {
       nodeInfoBody.appendChild(document.createTextNode('Vertices: '));
       nodeInfoBody.appendChild(document.createElement("BR"));  // line break
-      for (let vertex of node.vertices) {
+      for (let i=0; i<node.vertices.length; i++) {
+        let vertex = vertices[node.vertices[i]];
         let cell = document.createElement('tr');
         let infoString = " ‣ " + vertex.nodeA.id + " - " + vertex.nodeB.id + " (" + vertex.value + ")";
         cell.appendChild(document.createTextNode(infoString));
         let deleteButton = document.createElement("BUTTON");
         deleteButton.appendChild(document.createTextNode("[X]"));
         deleteButton.onclick = function() {
-          deleteVertex(vertex );  // TODO: DELETE VERTEX ONLY REMOVES VISUAL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          deleteVertex(vertex.id);
         }
         cell.appendChild(deleteButton);
         nodeInfoBody.appendChild(cell);
@@ -234,10 +222,5 @@ function drawSelectedNodesInfo() {
 
 
 function getNodeById(id) {
-  for (let node of nodes) {
-    if (node.id == id) {
-      return node
-    }
-  }
-  return null;
+  return nodes[id];
 }

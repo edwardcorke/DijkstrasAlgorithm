@@ -1,8 +1,10 @@
 class Vertex {
-  constructor(nodeA, nodeB) {
+  constructor(nodeA, nodeB, id) {
+    this.id = id;
     this.nodeA = nodeA;
     this.nodeB = nodeB;
     this.value;
+    this.status = "visible";
     this.color = 200;
   }
 
